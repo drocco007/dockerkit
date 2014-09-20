@@ -3,6 +3,11 @@
 if [[ -z $1 ]]
 then
     echo "usage: $0 <ClientName> [client_key]"
+    echo
+    echo "If unset, client_key is set to lower(ClientName), e.g."
+    echo
+    echo "    NHA nha"
+    echo
     exit -1
 fi
 
@@ -23,7 +28,7 @@ SOURCE_ROOT=/home/dan/source/brightlink
 PIP_DOWNLOAD_CACHE=$HOME/.cache/pip
 
 # Remove existing image
-docker rmi $CLIENT
+docker rmi $CLIENT 2>/dev/null
 
 # Build the temporary container, passing CLIENT and BTCLIENT to the
 # container.
