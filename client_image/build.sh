@@ -24,7 +24,7 @@ fi
 echo $BTCLIENT $CLIENT
 
 # Host environment
-SOURCE_ROOT=/home/dan/source/brightlink
+SOURCE_ROOT=$HOME/source/brightlink
 PIP_DOWNLOAD_CACHE=$HOME/.cache/pip
 
 # Remove existing image

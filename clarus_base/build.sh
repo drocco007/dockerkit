@@ -1,5 +1,5 @@
 NAME="clarus_base"
-SOURCE_ROOT=/home/dan/source/brightlink
+SOURCE_ROOT=$HOME/source/brightlink
 PIP_DOWNLOAD_CACHE=$HOME/.cache/pip
 
 
