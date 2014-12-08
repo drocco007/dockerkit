@@ -10,7 +10,7 @@ fi
 CLIENT=${1,,}
 
 TEMP_SCHEMA=$(ssh cloud tempfile -p ${CLIENT} -s _schema.sql)
-TEMP_DATA=$(ssh cloud tempfile -p ${CLIENT} -s _data.sql)
+TEMP_DATA=$(ssh cloud tempfile -p ${CLIENT} -s _data.pgdump)
 
 # Tables for which we want the schema only
 DATA_EXCLUDES=(notification job_queue_history email email_event audit_record eem_keyed_response django_session user_notification visit visit_identity)
@@ -19,11 +19,11 @@ DATA_EXCLUDES=(notification job_queue_history email email_event audit_record eem
 ssh cloud /usr/lib/postgresql/9.3/bin/pg_dump -U ${CLIENT}_user -C -s -f $TEMP_SCHEMA ${CLIENT}_data
 
 # Get the data, excluding the tables in DATA_EXCLUDES
-ssh cloud /usr/lib/postgresql/9.3/bin/pg_dump -U ${CLIENT}_user --data-only "${DATA_EXCLUDES[@]/#/-T }" -f $TEMP_DATA ${CLIENT}_data
+ssh cloud /usr/lib/postgresql/9.3/bin/pg_dump -U ${CLIENT}_user -F c --data-only "${DATA_EXCLUDES[@]/#/-T }" -f $TEMP_DATA ${CLIENT}_data
 
 # Fetch the databases
 scp -C "cloud:$TEMP_SCHEMA" ${CLIENT}_schema.sql
-scp -C "cloud:$TEMP_DATA" ${CLIENT}_data.sql
+scp -C "cloud:$TEMP_DATA" ${CLIENT}_data.pgdump
 
 # Clean up
 ssh cloud rm $TEMP_SCHEMA $TEMP_DATA
