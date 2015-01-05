@@ -18,6 +18,9 @@ Required Host System Tools
 * postgresql-client-9.3
 * jq
 
+Giving non-root access:
+
+    https://docs.docker.com/installation/ubuntulinux/#giving-non-root-access
 
 Building the Base Images
 ------------------------
