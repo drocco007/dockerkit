@@ -28,7 +28,7 @@ done
 $PIP --allow-all-external --allow-unverified PEAK-Rules --allow-unverified CherryPy --allow-unverified cElementTree --allow-unverified elementtree --allow-unverified pyDes -r /brightlink_dev/brighttrac/requirements.txt
 $PIP -r /brightlink_dev/modules-git/blcore/requirements.txt
 $PIP -r /brightlink_dev/modules-git/bltemplates/requirements.txt
-$PIP pytest pytest-xdist pdbpp
+$PIP pytest pytest-xdist pdbpp django-debug-toolbar==0.9.1
 
 
 # Install our packages
