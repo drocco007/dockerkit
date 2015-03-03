@@ -1,0 +1,29 @@
+# Default server configuration
+#
+server {
+	listen 80 default_server;
+	listen [::]:80 default_server;
+
+	server_name _;
+
+	# FIXME: hardcoded port
+	location / {
+		proxy_pass http://appserver:9085/;
+	}
+
+	location /static/ {
+		alias /clarus/static/;
+	}
+
+	location /blcore/custom/static/ {
+		alias /custom/static/;
+	}
+
+	location /blcore/static/ {
+		alias /blcore/static/;
+	}
+
+	location /admin/webtop/static/ {
+		alias /webtop/static/;
+	}
+}

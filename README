@@ -37,6 +37,9 @@ sudo docker build -t pybase .
 cd vol/
 sudo ./build.sh
 
+cd nginx
+docker build -t clarus_nginx .
+
 cd clarus_base/
 <edit build.sh for paths>
 sudo ./build.sh
@@ -64,3 +67,24 @@ Working with Docker
 Tail server logs::
 
     while true ; do docker attach --sig-proxy=false cidq_server | grep -E --color 'blcore.events|$' ; sleep 2 ; done
+
+
+Nginx
+-----
+
+docker run -d -p 80:80 --link nha_server:appserver -v ~/source/brightlink/brighttrac:/clarus -v ~/source/brightlink/nha:/custom -v ~/source/brightlink/modules-git/blcore:/blcore -v ~/source/brightlink/modules-git/blwebtop:/webtop --name nha_nginx clarus_nginx
+
+--link nha_server:appserver
+
+    Container endpoint for proxied requests. Anything not served
+    statically will be redirected here.
+
+
+-v ~/source/brightlink/brighttrac:/clarus
+-v ~/source/brightlink/nha:/custom
+-v ~/source/brightlink/modules-git/blcore:/blcore
+-v ~/source/brightlink/modules-git/blwebtop:/webtop
+
+    Static file locations. Modifying the paths on the left
+    (particularly for /custom) allows resuing the same image for
+    different clients by adjusting the custom static content location.
