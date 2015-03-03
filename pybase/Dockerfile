@@ -4,7 +4,7 @@ MAINTAINER drocco@gmail.com
 
 # system packages
 RUN apt-get update
-RUN apt-get install -y python-pip python-dev libjpeg-dev libz-dev libpq-dev
+RUN apt-get install -y python-pip python-dev libjpeg-dev libz-dev libpq-dev git
 RUN pip install --download-cache /tmp -U pip
 
 RUN pip install --download-cache /tmp -U setuptools virtualenv
