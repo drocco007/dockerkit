@@ -32,7 +32,7 @@ $PIP pytest pytest-xdist pdbpp django-debug-toolbar==0.9.1
 
 
 # Install our packages
-for package in blcore blauthentication blconfig blerrorhandling bllang blnotification blexcel blrules blfilter bllocking blscripts blcrypto blintegration blmonitor bltemplates blwebtop utctime template_resolver blpayments ; do
+for package in blcore blauthentication blconfig blerrorhandling bllang blnotification blexcel blrules blfilter bllocking blscripts blcrypto blintegration blmonitor bltemplates blwebtop utctime template_resolver blpayments switchboard ; do
     cd /brightlink_dev/modules-git/$package
     $PYTHON setup.py develop
     cd -
