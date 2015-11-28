@@ -87,4 +87,10 @@ docker run -d -p 80:80 --link nha_server:appserver -v ~/source/brightlink/bright
 
     Static file locations. Modifying the paths on the left
     (particularly for /custom) allows resuing the same image for
-    different clients by adjusting the custom static content location.
+    different clients by adjusting the custom static content location.sudo docker build -t pybase .
+
+
+“Load balancer”
+---------------
+
+docker run -d -v /var/run/docker.sock:/docker.sock --name wacos cpuguy83/docker-grand-ambassador -name wacos_nginx -sock /docker.sock
