@@ -31,16 +31,15 @@ $PIP -r /brightlink_dev/modules-git/bltemplates/requirements.txt
 $PIP pytest pytest-xdist pdbpp django-debug-toolbar==0.9.1
 
 
+$PIP -r /brightlink_dev/satchmo_braintree/requirements.txt
+$PIP -e /brightlink_dev/satchmo_braintree
+
 # Install our packages
-for package in blcore blauthentication blconfig blerrorhandling bllang blnotification blexcel blrules blfilter bllocking blscripts blcrypto blintegration blmonitor bltemplates blwebtop utctime template_resolver blpayments switchboard ; do
+for package in blcore blauthentication blconfig blerrorhandling bllang blnotification blexcel blrules blfilter bllocking blscripts blcrypto blintegration blmonitor bltemplates blwebtop utctime template_resolver blpayments switchboard turborest ; do
     cd /brightlink_dev/modules-git/$package
     $PYTHON setup.py develop
     cd -
 done
-
-cd /brightlink_dev/turborest
-$PYTHON setup.py develop
-cd -
 
 EOF
 
