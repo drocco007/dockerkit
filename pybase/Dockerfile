@@ -5,6 +5,8 @@ MAINTAINER drocco@gmail.com
 # system packages
 RUN apt-get update
 RUN apt-get install -y python-pip python-dev libjpeg-dev libz-dev libpq-dev git
+RUN apt-get install -y libxml2-dev libxslt-dev
+RUN apt-get install -y libffi-dev
 RUN pip install --download-cache /tmp -U pip
 
 RUN pip install --download-cache /tmp -U setuptools virtualenv
@@ -21,3 +23,8 @@ RUN echo '#define HAVE_MEMMOVE 1' >> /usr/include/python2.7/pyconfig.h
 
 # add a docker user
 RUN adduser --gecos 'Normal Docker (non-root) user' --home /home/docker --disabled-password docker
+
+
+# generate en_US.utf8 locale
+RUN locale-gen "en_US.UTF-8"
+RUN dpkg-reconfigure locales
