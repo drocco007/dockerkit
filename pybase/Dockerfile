@@ -3,13 +3,20 @@ MAINTAINER drocco@gmail.com
 
 
 # system packages
-RUN apt-get update
-RUN apt-get install -y python-pip python-dev libjpeg-dev libz-dev libpq-dev git
-RUN apt-get install -y libxml2-dev libxslt-dev
-RUN apt-get install -y libffi-dev
-RUN pip install --download-cache /tmp -U pip
+RUN apt-get update && apt-get install --no-install-recommends -y \
+    libffi-dev \
+    libjpeg-dev \
+    libpq-dev \
+    libxml2-dev \
+    libxslt-dev \
+    libz-dev \
+    python-pip \
+    python-dev \
+&& apt-get clean \
+&& rm -rf /var/lib/apt/lists/*
 
-RUN pip install --download-cache /tmp -U setuptools virtualenv
+RUN pip install -U pip
+RUN pip install -U setuptools virtualenv
 
 
 # allow PIL to find 64-bit libs
