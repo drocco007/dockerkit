@@ -11,5 +11,7 @@ RUN ["/bin/bash", "-c", "echo -e '\ndaemon off;' >> /etc/nginx/nginx.conf"]
 # Install our server configuration
 COPY default /etc/nginx/conf.d/default.conf
 
+COPY nginx.crt nginx.key /etc/nginx/conf.d/
+
 # Run nginx when the container starts
 CMD ["nginx"]
