@@ -9,8 +9,10 @@ docker build -t "$NAME" .
 docker run -i --name "$NAME" \
   -v "$SOURCE_ROOT:/brightlink_dev" -v "$PIP_DOWNLOAD_CACHE:/home/docker/.cache/pip" -u docker "$NAME" /bin/bash <<'EOF'
 
+set -e
+
 export PIP_DOWNLOAD_CACHE=$HOME/.cache/pip
-PIP="/home/docker/docker_env/bin/pip install "
+PIP="/home/docker/docker_env/bin/pip install --extra-index-url https://devpi.thebrightlink.com/ops/brightlink/+simple/ "
 PYTHON="/home/docker/docker_env/bin/python"
 
 $PIP /brightlink_dev/packages/trml2pdf/trml2pdf-1.0.tar.gz
@@ -26,6 +28,7 @@ done
 
 # Install the base Python packages
 $PIP --allow-all-external --allow-unverified PEAK-Rules --allow-unverified CherryPy --allow-unverified cElementTree --allow-unverified elementtree --allow-unverified pyDes -r /brightlink_dev/brighttrac/requirements.txt
+$PIP -r /brightlink_dev/modules-git/blauthentication/requirements.txt
 $PIP -r /brightlink_dev/modules-git/blcore/requirements.txt
 $PIP -r /brightlink_dev/modules-git/bltemplates/requirements.txt
 $PIP pytest pytest-xdist pdbpp django-debug-toolbar==0.9.1
@@ -40,6 +43,8 @@ for package in blcore blauthentication blconfig blerrorhandling bllang blnotific
     $PYTHON setup.py develop
     cd -
 done
+
+$PIP -e /brightlink_dev/compass
 
 EOF
 

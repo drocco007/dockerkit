@@ -4,6 +4,7 @@ MAINTAINER drocco@gmail.com
 
 # system packages
 RUN apt-get update && apt-get install --no-install-recommends -y \
+    build-essential \
     libffi-dev \
     libjpeg-dev \
     libpq-dev \
@@ -14,6 +15,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     python-dev \
 && apt-get clean \
 && rm -rf /var/lib/apt/lists/*
+
 
 RUN pip install -U pip
 RUN pip install -U setuptools virtualenv

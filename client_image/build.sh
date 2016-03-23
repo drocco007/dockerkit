@@ -34,15 +34,18 @@ docker rmi $CLIENT 2>/dev/null
 # container.
 
 docker run -i --name "$CLIENT" \
-  -e CLIENT=$CLIENT -e BTCLIENT=$BTCLIENT \
+  -e CLIENT=$CLIENT -e BTCLIENT=$BTCLIENT -e PACKAGES="$PACKAGES" \
   -v "$SOURCE_ROOT:/brightlink_dev" -v "$PIP_DOWNLOAD_CACHE:/home/docker/.cache/pip" -u docker clarus_base /bin/bash <<'EOF'
+
+echo $PACKAGES
+echo
 
 export PIP_DOWNLOAD_CACHE=$HOME/.cache/pip
 PIP="/home/docker/docker_env/bin/pip install "
 PYTHON="/home/docker/docker_env/bin/python"
 
 # Install core and custom
-for package in brighttrac $CLIENT ; do
+for package in brighttrac $CLIENT $PACKAGES ; do
     cd /brightlink_dev/$package
     $PYTHON setup.py develop
     cd -
