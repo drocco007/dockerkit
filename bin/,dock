@@ -1,0 +1,214 @@
+#!/bin/bash
+
+shopt -s extglob
+
+
+if [ -z "$1" ]
+then
+    echo "usage: $0 <command> [args]"
+    exit -1
+fi
+
+
+. ~/bin/lib/client.sh
+
+read_client_data
+
+
+IMAGE=${CLIENT_DATA[docker_image]}
+CLARUS_PORT=${CLIENT_DATA[clarus_port]}
+CONTAINER=${CLIENT_DATA[container]}
+DATA_CONTAINER=${CLIENT_DATA[db]}
+DB_CONTAINER=${CLIENT_DATA[db_container]}
+STORE_SETTINGS=${CLIENT_DATA[store_settings]}
+
+
+DOCKER0=$(/sbin/ifconfig docker0 | grep "inet addr" | awk '{ print $2}' | cut -d: -f2)
+
+
+COMMAND=$1
+shift
+
+case "$COMMAND" in
+
+    @(dns) )
+
+        docker run \
+            --detach \
+            --name dns \
+            --publish $DOCKER0:53:53/udp \
+            --volume /var/run/docker.sock:/var/run/docker.sock \
+            jderusse/dns-gen
+
+        ;;
+
+
+    @(nginx|proxy) )
+
+        docker run \
+            -d \
+            -p 80:80 \
+            -p 443:443 \
+            -e DOMAIN_NAME=brighttrac.example.com,store.example.com \
+            -v /home/drocco/source/brightlink/clarus:/clarus:ro \
+            -v /home/drocco/source/brightlink/modules-git/blcore:/blcore:ro \
+            -v /home/drocco/source/brightlink/modules-git/blwebtop:/webtop:ro \
+            -v /home/drocco/source/brightlink/docker/nginx/certs:/etc/nginx/certs:ro \
+            -v /home/drocco/source/brightlink/docker/nginx/vhost.d:/etc/nginx/vhost.d:ro \
+            -v /var/run/docker.sock:/tmp/docker.sock:ro \
+            --name nginx \
+            jwilder/nginx-proxy
+
+        # Change the nginx user's UID to our UID so static content will load
+        docker exec nginx usermod -u $(id -u) nginx && docker restart -t 0 nginx
+
+        ;;
+
+
+    @(db|database) )
+            docker run \
+                -d \
+                --name ${DB_CONTAINER} \
+                -e DOMAIN_NAME=dbhost \
+                --volumes-from ${DATA_CONTAINER} \
+                postgres
+
+        ;;
+
+
+    @(shell|tgshell|tg) )
+
+        SHELL_ID=$(docker ps -aqf name=${LOWER_CLIENT}_shell)
+
+        if [ -n "$SHELL_ID" ]
+        then
+            docker restart ${SHELL_ID} && docker attach ${SHELL_ID}
+        else
+            docker run -it \
+                --dns $DOCKER0 \
+                -e TERM=screen-256color \
+                -v /home/drocco/source/brightlink:/brightlink_dev \
+                -u docker \
+                --volumes-from vollog \
+                --name ${LOWER_CLIENT}_shell \
+                -w /brightlink_dev/brighttrac \
+                $IMAGE \
+                /home/docker/docker_env/bin/tg-admin -c ../${LOWER_CLIENT}/dev.cfg shell
+        fi
+
+        ;;
+
+
+    @(bt|brighttrac|server) )
+
+        docker run \
+            -dit \
+            --dns $DOCKER0 \
+            -e TERM=screen-256color \
+            -p ${CLARUS_PORT}:${CLARUS_PORT} \
+            -v /home/drocco/source/brightlink:/brightlink_dev \
+            -u docker \
+            -e VIRTUAL_HOST=brighttrac.example.com \
+            -e VIRTUAL_PORT=${CLARUS_PORT} \
+            --volumes-from vollog \
+            --name ${LOWER_CLIENT}_server \
+            $IMAGE \
+            /home/docker/docker_env/bin/python -u /brightlink_dev/brighttrac/start-brighttrac2.1.py /brightlink_dev/${LOWER_CLIENT}/dev.cfg
+        ;;
+
+
+    @(store|satchmo) )
+
+        docker run \
+            -dit \
+            --dns $DOCKER0 \
+            -e TERM=screen-256color \
+            -p 6086:6086 \
+            -v /home/drocco/source/brightlink:/brightlink_dev \
+            -u docker \
+            -e VIRTUAL_HOST=store.example.com \
+            -e VIRTUAL_PORT=6086 \
+            --volumes-from vollog \
+            --name ${LOWER_CLIENT}_store \
+            -w /brightlink_dev/brighttrac \
+            $IMAGE \
+            /home/docker/docker_env/bin/python /brightlink_dev/brighttrac/brighttrac2/store/manage.py runserver --settings=${STORE_SETTINGS} 0.0.0.0:6086
+
+        ;;
+
+
+    @(ss|storeshell|store-shell) )
+
+        SHELL_ID=$(docker ps -aqf name=${LOWER_CLIENT}_store_shell)
+
+        if [ -n "$SHELL_ID" ]
+        then
+            docker restart ${SHELL_ID} && docker attach ${SHELL_ID}
+        else
+            docker run \
+                -it \
+                --dns $DOCKER0 \
+                -e TERM=screen-256color \
+                -v /home/drocco/source/brightlink:/brightlink_dev \
+                -u docker \
+                --volumes-from vollog \
+                --name ${LOWER_CLIENT}_store_shell \
+                -w /brightlink_dev/brighttrac \
+                $IMAGE \
+                /home/docker/docker_env/bin/python /brightlink_dev/brighttrac/brighttrac2/store/manage.py shell --settings=${STORE_SETTINGS}
+        fi
+
+        ;;
+
+
+    @(jq) )
+
+        docker run \
+            -dit \
+            --dns $DOCKER0 \
+            -e TERM=screen-256color \
+            -v /home/drocco/source/brightlink:/brightlink_dev \
+            -u docker \
+            --volumes-from vollog \
+            --name ${LOWER_CLIENT}_job_queue \
+            -w /brightlink_dev/brighttrac \
+            $IMAGE \
+            /home/docker/docker_env/bin/python \
+                /brightlink_dev/modules-git/blcore/blcore/job_queue/bin/start_job_queue_processor.py /brightlink_dev/${LOWER_CLIENT}/dev.cfg
+
+        ;;
+
+
+    exec )
+
+        docker exec -it $CONTAINER $@
+        ;;
+
+
+    logs )
+        tmux rename-window "$LOWER_CLIENT logs"
+        while true
+        do
+            docker attach --sig-proxy=false --no-stdin $CONTAINER \
+                | grep -E --color 'blcore.events|$'
+
+            sleep 2
+        done
+        ;;
+
+
+    ip )
+        docker  inspect -f '{{.NetworkSettings.IPAddress}}' $CONTAINER
+        ;;
+
+
+    dbip )
+        docker  inspect -f '{{.NetworkSettings.IPAddress}}' $DB_CONTAINER
+        ;;
+
+
+    * )
+
+        echo "Unknown command: $COMMAND"
+        ;;
+esac

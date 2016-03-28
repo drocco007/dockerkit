@@ -1,0 +1,17 @@
+#!/bin/bash
+
+. ~/bin/lib/client.sh
+
+read_client_data
+
+CONTAINER=${CLIENT_DATA[db_container]}
+USER=${CLIENT_DATA[db_user]}
+DB=${CLIENT_DATA[db]}
+
+HOST=$(docker inspect -f '{{.NetworkSettings.IPAddress}}' $CONTAINER)
+
+EXE=$(basename $0)
+EXE=${EXE:1}
+
+echo $EXE -h $HOST $@ $DB $USER
+$EXE -h $HOST $@ $DB $USER
