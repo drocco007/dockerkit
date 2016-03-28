@@ -20,16 +20,6 @@ FORKS_ROOT=$SOURCE_ROOT/packages/forks
 PIP="/home/docker/docker_env/bin/pip install --extra-index-url https://devpi.thebrightlink.com/ops/brightlink/+simple/ "
 PYTHON="/home/docker/docker_env/bin/python"
 
-$PIP trml2pdf
-
-for package in `find $FORKS_ROOT -name trunk` ; do
-    cd $package
-
-    # not develop because it breaks django
-    $PYTHON setup.py install
-    cd -
-done
-
 
 # Install the base Python packages
 $PIP --allow-all-external --allow-unverified PEAK-Rules --allow-unverified CherryPy --allow-unverified cElementTree --allow-unverified elementtree --allow-unverified pyDes -r $CLARUS_ROOT/requirements.txt
