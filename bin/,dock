@@ -115,14 +115,14 @@ case "$COMMAND" in
             --dns $DOCKER0 \
             -e TERM=screen-256color \
             -p ${CLARUS_PORT}:${CLARUS_PORT} \
-            -v /home/drocco/source/brightlink:/brightlink_dev \
+            -v $SOURCE_ROOT:/brightlink_dev \
             -u docker \
             -e VIRTUAL_HOST=brighttrac.example.com \
             -e VIRTUAL_PORT=${CLARUS_PORT} \
             --volumes-from vollog \
             --name ${LOWER_CLIENT}_server \
             $IMAGE \
-            /home/docker/docker_env/bin/python -u $VM_CLARUS_ROOT/start-brighttrac2.1.py $VM_CLIENT_ROOT/dev.cfg/dev.cfg
+            /home/docker/docker_env/bin/python -u $VM_CLARUS_ROOT/start-brighttrac2.1.py $VM_CLIENT_ROOT/dev.cfg
         ;;
 
 
@@ -133,7 +133,7 @@ case "$COMMAND" in
             --dns $DOCKER0 \
             -e TERM=screen-256color \
             -p 6086:6086 \
-            -v /home/drocco/source/brightlink:/brightlink_dev \
+            -v $SOURCE_ROOT:/brightlink_dev \
             -u docker \
             -e VIRTUAL_HOST=store.example.com \
             -e VIRTUAL_PORT=6086 \
@@ -158,7 +158,7 @@ case "$COMMAND" in
                 -it \
                 --dns $DOCKER0 \
                 -e TERM=screen-256color \
-                -v /home/drocco/source/brightlink:/brightlink_dev \
+                -v $SOURCE_ROOT:/brightlink_dev \
                 -u docker \
                 --volumes-from vollog \
                 --name ${LOWER_CLIENT}_store_shell \
@@ -176,7 +176,7 @@ case "$COMMAND" in
             -dit \
             --dns $DOCKER0 \
             -e TERM=screen-256color \
-            -v /home/drocco/source/brightlink:/brightlink_dev \
+            -v $SOURCE_ROOT:/brightlink_dev \
             -u docker \
             --volumes-from vollog \
             --name ${LOWER_CLIENT}_job_queue \
