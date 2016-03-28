@@ -23,6 +23,15 @@ DB_CONTAINER=${CLIENT_DATA[db_container]}
 STORE_SETTINGS=${CLIENT_DATA[store_settings]}
 
 
+SOURCE_ROOT=/home/mengbo/src
+CLARUS_ROOT=$SOURCE_ROOT/clarus
+MODULES_ROOT=$SOURCE_ROOT/modules-git
+NGINX_ROOT=$SOURCE_ROOT/docker/nginx
+
+VM_CLARUS_ROOT=/brightlink_dev/clarus/clarus
+VM_CLIENT_ROOT=/brightlink_dev/clarus/$LOWER_CLIENT
+VM_MODULES_ROOT=/brightlink_dev/infrastructure
+
 DOCKER0=$(/sbin/ifconfig docker0 | grep "inet addr" | awk '{ print $2}' | cut -d: -f2)
 
 
@@ -50,11 +59,11 @@ case "$COMMAND" in
             -p 80:80 \
             -p 443:443 \
             -e DOMAIN_NAME=brighttrac.example.com,store.example.com \
-            -v /home/drocco/source/brightlink/clarus:/clarus:ro \
-            -v /home/drocco/source/brightlink/modules-git/blcore:/blcore:ro \
-            -v /home/drocco/source/brightlink/modules-git/blwebtop:/webtop:ro \
-            -v /home/drocco/source/brightlink/docker/nginx/certs:/etc/nginx/certs:ro \
-            -v /home/drocco/source/brightlink/docker/nginx/vhost.d:/etc/nginx/vhost.d:ro \
+            -v $CLARUS_ROOT:/clarus:ro \
+            -v $MODULES_ROOT/blcore:/blcore:ro \
+            -v $MODULES_ROOT/blwebtop:/webtop:ro \
+            -v $NGINX_ROOT/certs:/etc/nginx/certs:ro \
+            -v $NGINX_ROOT/vhost.d:/etc/nginx/vhost.d:ro \
             -v /var/run/docker.sock:/tmp/docker.sock:ro \
             --name nginx \
             jwilder/nginx-proxy
@@ -87,13 +96,13 @@ case "$COMMAND" in
             docker run -it \
                 --dns $DOCKER0 \
                 -e TERM=screen-256color \
-                -v /home/drocco/source/brightlink:/brightlink_dev \
+                -v $SOURCE_ROOT:/brightlink_dev \
                 -u docker \
                 --volumes-from vollog \
                 --name ${LOWER_CLIENT}_shell \
-                -w /brightlink_dev/brighttrac \
+                -w $VM_CLARUS_ROOT \
                 $IMAGE \
-                /home/docker/docker_env/bin/tg-admin -c ../${LOWER_CLIENT}/dev.cfg shell
+                /home/docker/docker_env/bin/tg-admin -c $VM_CLIENT_ROOT/dev.cfg shell
         fi
 
         ;;
@@ -113,7 +122,7 @@ case "$COMMAND" in
             --volumes-from vollog \
             --name ${LOWER_CLIENT}_server \
             $IMAGE \
-            /home/docker/docker_env/bin/python -u /brightlink_dev/brighttrac/start-brighttrac2.1.py /brightlink_dev/${LOWER_CLIENT}/dev.cfg
+            /home/docker/docker_env/bin/python -u $VM_CLARUS_ROOT/start-brighttrac2.1.py $VM_CLIENT_ROOT/dev.cfg/dev.cfg
         ;;
 
 
@@ -132,7 +141,7 @@ case "$COMMAND" in
             --name ${LOWER_CLIENT}_store \
             -w /brightlink_dev/brighttrac \
             $IMAGE \
-            /home/docker/docker_env/bin/python /brightlink_dev/brighttrac/brighttrac2/store/manage.py runserver --settings=${STORE_SETTINGS} 0.0.0.0:6086
+            /home/docker/docker_env/bin/python $VM_CLARUS_ROOT/brighttrac2/store/manage.py runserver --settings=${STORE_SETTINGS} 0.0.0.0:6086
 
         ;;
 
@@ -155,7 +164,7 @@ case "$COMMAND" in
                 --name ${LOWER_CLIENT}_store_shell \
                 -w /brightlink_dev/brighttrac \
                 $IMAGE \
-                /home/docker/docker_env/bin/python /brightlink_dev/brighttrac/brighttrac2/store/manage.py shell --settings=${STORE_SETTINGS}
+                /home/docker/docker_env/bin/python $VM_CLARUS_ROOT/brighttrac2/store/manage.py shell --settings=${STORE_SETTINGS}
         fi
 
         ;;
@@ -174,7 +183,7 @@ case "$COMMAND" in
             -w /brightlink_dev/brighttrac \
             $IMAGE \
             /home/docker/docker_env/bin/python \
-                /brightlink_dev/modules-git/blcore/blcore/job_queue/bin/start_job_queue_processor.py /brightlink_dev/${LOWER_CLIENT}/dev.cfg
+                $VM_MODULES_ROOT/blcore/blcore/job_queue/bin/start_job_queue_processor.py $VM_CLIENT_ROOT/dev.cfg
 
         ;;
 
