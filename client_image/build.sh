@@ -51,6 +51,16 @@ for package in brighttrac $CLIENT $PACKAGES ; do
     cd -
 done
 
+
+# HACK: find a way to generalize this
+if [[ "$CLIENT" -eq "NHA" ]]
+then
+    cd /brightlink_dev/nha_student_portal
+    $PYTHON setup.py develop
+    cd -
+fi
+
+
 # Symlink needed until we fix custom client loading
 mkdir -p /src/clients/$BTCLIENT/
 ln -s /brightlink_dev/$CLIENT /src/clients/$BTCLIENT/trunk

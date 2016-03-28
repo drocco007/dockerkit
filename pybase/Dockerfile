@@ -18,7 +18,6 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 && rm -rf /var/lib/apt/lists/*
 
 
-RUN pip install -U pip
 RUN pip install -U setuptools virtualenv
 
 

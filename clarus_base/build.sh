@@ -1,5 +1,6 @@
 NAME="clarus_base"
 SOURCE_ROOT=$HOME/source/brightlink
+GUEST_ROOT=/brightlink_dev
 
 
 docker rm $NAME
@@ -7,7 +8,7 @@ docker build -t "$NAME" .
 
 
 docker run -i --name "$NAME" \
-  -v "$SOURCE_ROOT:/brightlink_dev" -u docker "$NAME" /bin/bash <<'EOF'
+  -e SOURCE_ROOT="$GUEST_ROOT" -v "$SOURCE_ROOT:$GUEST_ROOT" -u docker "$NAME" /bin/bash <<'EOF'
 
 set -e
 
@@ -15,6 +16,10 @@ set -e
 CLARUS_ROOT=$SOURCE_ROOT/clarus
 MODULES_ROOT=$SOURCE_ROOT/modules-git
 FORKS_ROOT=$SOURCE_ROOT/packages/forks
+
+
+# update virtualenv
+/home/docker/docker_env/bin/pip install -U pip
 
 
 PIP="/home/docker/docker_env/bin/pip install --extra-index-url https://devpi.thebrightlink.com/ops/brightlink/+simple/ "
@@ -41,6 +46,12 @@ for package in blcore blauthentication blconfig blerrorhandling bllang blnotific
 done
 
 $PIP -e /brightlink_dev/compass
+
+
+# Fix Django translations, templates, and other data files
+. /home/docker/docker_env/bin/activate
+python /home/docker/fix_django_files.py
+#rm /home/docker/fix_django_files.py
 
 EOF
 
