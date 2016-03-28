@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     libz-dev \
     python-pip \
     python-dev \
+    ntp \
 && apt-get clean \
 && rm -rf /var/lib/apt/lists/*
 
