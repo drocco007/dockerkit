@@ -1,5 +1,12 @@
 NAME="clarus_base"
-SOURCE_ROOT=$HOME/source/brightlink
+
+if [ -z "$SOURCE_ROOT" ]
+then
+    SOURCE_ROOT=$HOME/src
+fi
+
+echo "SOURCE_ROOT: $SOURCE_ROOT"
+
 GUEST_ROOT=/brightlink_dev
 
 
@@ -13,16 +20,15 @@ docker run -i --name "$NAME" \
 set -e
 
 
-CLARUS_ROOT=$SOURCE_ROOT/clarus
-MODULES_ROOT=$SOURCE_ROOT/modules-git
-FORKS_ROOT=$SOURCE_ROOT/packages/forks
+CLARUS_ROOT=$SOURCE_ROOT/clarus/clarus
+MODULES_ROOT=$SOURCE_ROOT/infrastructure
 
 
 # update virtualenv
 /home/docker/docker_env/bin/pip install -U pip
 
 
-PIP="/home/docker/docker_env/bin/pip install --extra-index-url https://devpi.thebrightlink.com/ops/brightlink/+simple/ "
+PIP="/home/docker/docker_env/bin/pip install -i https://devpi.thebrightlink.com/ops/brightlink/+simple/ "
 PYTHON="/home/docker/docker_env/bin/python"
 
 
@@ -34,8 +40,8 @@ $PIP -r $MODULES_ROOT/bltemplates/requirements.txt
 $PIP pytest pytest-xdist pdbpp django-debug-toolbar==0.9.1
 
 
-$PIP -r /brightlink_dev/satchmo_braintree/requirements.txt
-$PIP -e /brightlink_dev/satchmo_braintree
+$PIP -r $MODULES_ROOT/satchmo_braintree/requirements.txt
+$PIP -e $MODULES_ROOT/satchmo_braintree
 
 
 # Install our packages
@@ -45,13 +51,13 @@ for package in blcore blauthentication blconfig blerrorhandling bllang blnotific
     cd -
 done
 
-$PIP -e /brightlink_dev/compass
+$PIP -e $SOURCE_ROOT/clarus/compass
 
 
 # Fix Django translations, templates, and other data files
 . /home/docker/docker_env/bin/activate
 python /home/docker/fix_django_files.py
-#rm /home/docker/fix_django_files.py
+rm /home/docker/fix_django_files.py
 
 EOF
 
