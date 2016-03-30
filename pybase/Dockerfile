@@ -11,9 +11,9 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     libxml2-dev \
     libxslt-dev \
     libz-dev \
+    ntp \
     python-pip \
     python-dev \
-    ntp \
 && apt-get clean \
 && rm -rf /var/lib/apt/lists/*
 

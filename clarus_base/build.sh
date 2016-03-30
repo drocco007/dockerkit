@@ -14,8 +14,15 @@ docker rm $NAME
 docker build -t "$NAME" .
 
 
-docker run -i --name "$NAME" \
-  -e SOURCE_ROOT="$GUEST_ROOT" -v "$SOURCE_ROOT:$GUEST_ROOT" -u docker "$NAME" /bin/bash <<'EOF'
+docker run \
+    -i \
+    --name "$NAME" \
+    -e SOURCE_ROOT="$GUEST_ROOT" \
+    -v "$SOURCE_ROOT:$GUEST_ROOT" \
+    -v "$HOME/.cache:/home/docker/.cache" \
+    -u docker \
+    "$NAME" \
+    /bin/bash <<'EOF'
 
 set -e
 
