@@ -24,8 +24,14 @@ fi
 echo $BTCLIENT $CLIENT
 
 # Host environment
-SOURCE_ROOT=$HOME/source/brightlink
-PIP_DOWNLOAD_CACHE=$HOME/.cache/pip
+if [ -z "$SOURCE_ROOT" ]
+then
+    SOURCE_ROOT=$HOME/src
+fi
+
+echo "SOURCE_ROOT: $SOURCE_ROOT"
+
+GUEST_ROOT=/brightlink_dev
 
 # Remove existing image
 docker rmi $CLIENT 2>/dev/null
@@ -33,37 +39,35 @@ docker rmi $CLIENT 2>/dev/null
 # Build the temporary container, passing CLIENT and BTCLIENT to the
 # container.
 
-docker run -i --name "$CLIENT" \
-  -e CLIENT=$CLIENT -e BTCLIENT=$BTCLIENT -e PACKAGES="$PACKAGES" \
-  -v "$SOURCE_ROOT:/brightlink_dev" -v "$PIP_DOWNLOAD_CACHE:/home/docker/.cache/pip" -u docker clarus_base /bin/bash <<'EOF'
+docker run \
+    -i \
+    --name "$CLIENT" \
+    -e CLIENT=$CLIENT \
+    -e BTCLIENT=$BTCLIENT \
+    -e PACKAGES="$PACKAGES" \
+    -v "$SOURCE_ROOT:/brightlink_dev" \
+    -v "$HOME/.cache:/home/docker/.cache" \
+    -u docker \
+    clarus_base \
+    /bin/bash <<'EOF'
 
-echo $PACKAGES
+echo "PACKAGES: $PACKAGES"
 echo
 
-export PIP_DOWNLOAD_CACHE=$HOME/.cache/pip
-PIP="/home/docker/docker_env/bin/pip install "
+PIP="/home/docker/docker_env/bin/pip install -i https://devpi.thebrightlink.com/ops/brightlink/+simple/ "
 PYTHON="/home/docker/docker_env/bin/python"
 
 # Install core and custom
-for package in brighttrac $CLIENT $PACKAGES ; do
-    cd /brightlink_dev/$package
+for package in clarus $CLIENT $PACKAGES ; do
+    cd /brightlink_dev/clarus/$package
     $PYTHON setup.py develop
     cd -
 done
 
 
-# HACK: find a way to generalize this
-if [[ "$CLIENT" -eq "NHA" ]]
-then
-    cd /brightlink_dev/nha_student_portal
-    $PYTHON setup.py develop
-    cd -
-fi
-
-
 # Symlink needed until we fix custom client loading
 mkdir -p /src/clients/$BTCLIENT/
-ln -s /brightlink_dev/$CLIENT /src/clients/$BTCLIENT/trunk
+ln -s /brightlink_dev/clarus/$CLIENT /src/clients/$BTCLIENT/trunk
 
 EOF
 
