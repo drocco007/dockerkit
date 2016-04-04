@@ -34,7 +34,6 @@ NGINX_ROOT=$SOURCE_ROOT/docker/nginx
 
 VM_CLARUS_ROOT=/brightlink_dev/clarus/clarus
 VM_CLIENT_ROOT=/brightlink_dev/clarus/$LOWER_CLIENT
-VM_MODULES_ROOT=/brightlink_dev/infrastructure
 
 
 DOCKER0=$(/sbin/ifconfig docker0 | grep "inet addr" | awk '{ print $2}' | cut -d: -f2)
@@ -179,6 +178,7 @@ case "$COMMAND" in
 
 
     @(jq) )
+        VM_MODULES_ROOT=/brightlink_dev/infrastructure
 
         docker run \
             -dit \
@@ -188,7 +188,7 @@ case "$COMMAND" in
             -u docker \
             --volumes-from vollog \
             --name ${LOWER_CLIENT}_job_queue \
-            -w /brightlink_dev/brighttrac \
+            -w /brightlink_dev/clarus/clarus \
             $IMAGE \
             /home/docker/docker_env/bin/python \
                 $VM_MODULES_ROOT/blcore/blcore/job_queue/bin/start_job_queue_processor.py $VM_CLIENT_ROOT/dev.cfg
