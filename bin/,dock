@@ -140,13 +140,12 @@ case "$COMMAND" in
             -e TERM=screen-256color \
             -p 6086:6086 \
             -v $SOURCE_ROOT:/brightlink_dev \
-            -v $MODULES_ROOT:/brightlink_dev/infrastructure \
             -u docker \
             -e VIRTUAL_HOST=store.example.com \
             -e VIRTUAL_PORT=6086 \
             --volumes-from vollog \
             --name ${LOWER_CLIENT}_store \
-            -w /brightlink_dev/brighttrac \
+            -w /brightlink_dev/clarus/clarus \
             $IMAGE \
             /home/docker/docker_env/bin/python $VM_CLARUS_ROOT/brighttrac2/store/manage.py runserver --settings=${STORE_SETTINGS} 0.0.0.0:6086
 
@@ -169,7 +168,7 @@ case "$COMMAND" in
                 -u docker \
                 --volumes-from vollog \
                 --name ${LOWER_CLIENT}_store_shell \
-                -w /brightlink_dev/brighttrac \
+                -w /brightlink_dev/clarus/clarus \
                 $IMAGE \
                 /home/docker/docker_env/bin/python $VM_CLARUS_ROOT/brighttrac2/store/manage.py shell --settings=${STORE_SETTINGS}
         fi
