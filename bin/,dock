@@ -65,6 +65,7 @@ case "$COMMAND" in
             -p 80:80 \
             -p 443:443 \
             -e DOMAIN_NAME=brighttrac.example.com,store.example.com \
+            -v $SOURCE_ROOT:/brightlink_dev:ro \
             -v $CLARUS_ROOT:/clarus:ro \
             -v $MODULES_ROOT/blcore:/blcore:ro \
             -v $MODULES_ROOT/blwebtop:/webtop:ro \
