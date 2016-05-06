@@ -206,7 +206,7 @@ case "$COMMAND" in
         tmux rename-window "$LOWER_CLIENT logs"
         while true
         do
-            docker attach --sig-proxy=false --no-stdin $CONTAINER \
+            docker attach --sig-proxy=false --no-stdin $CONTAINER 2>/dev/null \
                 | grep -E --color 'blcore.events|$'
 
             sleep 2
