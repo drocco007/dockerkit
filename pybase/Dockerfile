@@ -1,6 +1,8 @@
 FROM ubuntu:trusty
 MAINTAINER drocco@gmail.com
 
+ARG UID=1000
+ARG GID=1000
 
 # system packages
 RUN apt-get update && apt-get install --no-install-recommends -y \
@@ -31,7 +33,13 @@ RUN echo '#define HAVE_MEMMOVE 1' >> /usr/include/python2.7/pyconfig.h
 
 
 # add a docker user
-RUN adduser --gecos 'Normal Docker (non-root) user' --home /home/docker --disabled-password docker
+RUN adduser \
+    --uid ${UID} \
+    --gid ${GID} \
+    --gecos 'Normal Docker (non-root) user' \
+    --home /home/docker \
+    --disabled-password \
+    docker
 
 
 # generate en_US.utf8 locale
