@@ -32,6 +32,12 @@ RUN ln -s /usr/lib/x86_64-linux-gnu/libz.so /usr/lib
 RUN echo '#define HAVE_MEMMOVE 1' >> /usr/include/python2.7/pyconfig.h
 
 
+# add a docker group
+RUN addgroup \
+    --gid ${GID} \
+    docker
+
+
 # add a docker user
 RUN adduser \
     --uid ${UID} \
