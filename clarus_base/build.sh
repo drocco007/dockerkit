@@ -35,7 +35,7 @@ MODULES_ROOT=$SOURCE_ROOT/infrastructure
 /home/docker/docker_env/bin/pip install -U pip
 
 
-PIP="/home/docker/docker_env/bin/pip install -i https://devpi.thebrightlink.com/ops/brightlink/+simple/ "
+PIP="/home/docker/docker_env/bin/pip install --extra-index https://devpi.thebrightlink.com/ops/brightlink/+simple/ "
 PYTHON="/home/docker/docker_env/bin/python"
 
 
