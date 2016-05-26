@@ -43,6 +43,7 @@ PYTHON="/home/docker/docker_env/bin/python"
 $PIP --allow-all-external --allow-unverified PEAK-Rules --allow-unverified CherryPy --allow-unverified cElementTree --allow-unverified elementtree --allow-unverified pyDes -r $CLARUS_ROOT/requirements.txt
 $PIP -r $MODULES_ROOT/blauthentication/requirements.txt
 $PIP -r $MODULES_ROOT/blcore/requirements.txt
+$PIP -r $MODULES_ROOT/blintegration/requirements.txt
 $PIP -r $MODULES_ROOT/bltemplates/requirements.txt
 $PIP pytest pytest-xdist pdbpp django-debug-toolbar==0.9.1
 
