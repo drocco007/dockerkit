@@ -10,17 +10,17 @@ MAINTAINER SvenDowideit@docker.com
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8
 
 # Add PostgreSQL's repository. It contains the most recent stable release
-#     of PostgreSQL, ``8.4``.
+#     of PostgreSQL, ``9.5``.
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main" > /etc/apt/sources.list.d/pgdg.list
 
 # Update the Ubuntu and PostgreSQL repository indexes
 RUN apt-get update
 
-# Install ``python-software-properties``, ``software-properties-common`` and PostgreSQL 8.4
+# Install ``python-software-properties``, ``software-properties-common`` and PostgreSQL 9.5
 #  There are some warnings (in red) that show up during the build. You can hide
 #  them by prefixing each apt-get statement with DEBIAN_FRONTEND=noninteractive
 RUN apt-get -y -q install python-software-properties software-properties-common
-RUN apt-get -y -q install postgresql-8.4 postgresql-client-8.4 postgresql-contrib-8.4
+RUN apt-get -y -q install postgresql-9.5 postgresql-client-9.5 postgresql-contrib-9.5
 
 # Note: The official Debian and Ubuntu images automatically ``apt-get clean``
 # after each ``apt-get``
@@ -29,12 +29,12 @@ RUN apt-get -y -q install postgresql-8.4 postgresql-client-8.4 postgresql-contri
 #RUN sed -i "/^# en_US\.UTF-8.*/s/^# //" /etc/locale.gen
 RUN locale-gen en_US.UTF-8
 
-# Run the rest of the commands as the ``postgres`` user created by the ``postgres-8.4`` package when it was ``apt-get installed``
+# Run the rest of the commands as the ``postgres`` user created by the ``postgres-9.5`` package when it was ``apt-get installed``
 USER postgres
 
 # Fix the default encoding (http://jacobian.org/writing/pg-encoding-ubuntu/)
-RUN pg_dropcluster --stop 8.4 main &&\
-    pg_createcluster --start -e UTF-8 8.4 main
+RUN pg_dropcluster --stop 9.5 main &&\
+    pg_createcluster --start -e UTF-8 9.5 main
 
 # Create a PostgreSQL role named ``docker`` with ``docker`` as the password and
 # then create a database `docker` owned by the ``docker`` role.
@@ -46,10 +46,10 @@ RUN    /etc/init.d/postgresql start &&\
 
 # Adjust PostgreSQL configuration so that remote connections to the
 # database are possible.
-RUN echo "host all  all    0.0.0.0/0  trust" >> /etc/postgresql/8.4/main/pg_hba.conf
+RUN echo "host all  all    0.0.0.0/0  trust" >> /etc/postgresql/9.5/main/pg_hba.conf
 
-# And add ``listen_addresses`` to ``/etc/postgresql/8.4/main/postgresql.conf``
-RUN echo "listen_addresses='*'" >> /etc/postgresql/8.4/main/postgresql.conf
+# And add ``listen_addresses`` to ``/etc/postgresql/9.5/main/postgresql.conf``
+RUN echo "listen_addresses='*'" >> /etc/postgresql/9.5/main/postgresql.conf
 
 # Expose the PostgreSQL port
 EXPOSE 5432
@@ -58,4 +58,4 @@ EXPOSE 5432
 VOLUME  ["/etc/postgresql", "/var/log/postgresql", "/var/lib/postgresql"]
 
 # Set the default command to run when starting the container
-CMD ["/usr/lib/postgresql/8.4/bin/postgres", "-D", "/var/lib/postgresql/8.4/main", "-c", "config_file=/etc/postgresql/8.4/main/postgresql.conf"]
+CMD ["/usr/lib/postgresql/9.5/bin/postgres", "-D", "/var/lib/postgresql/9.5/main", "-c", "config_file=/etc/postgresql/9.5/main/postgresql.conf"]
