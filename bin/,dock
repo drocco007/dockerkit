@@ -32,8 +32,16 @@ echo "SOURCE_ROOT: $SOURCE_ROOT"
 CLARUS_ROOT=$SOURCE_ROOT/clarus/clarus
 NGINX_ROOT=$SOURCE_ROOT/docker/nginx
 
-VM_CLARUS_ROOT=/brightlink_dev/clarus/clarus
-VM_CLIENT_ROOT=/brightlink_dev/clarus/$LOWER_CLIENT
+if [[ "cdca cita srta" =~ $LOWER_CLIENT ]]; then
+    VM_BASE_ROOT=/brightlink_dev/brighttrac/adex
+    VM_CLIENT_ROOT=/brightlink_dev/brighttrac/$LOWER_CLIENT
+elif [[ "ndeb_acc ndeb_nonacc" =~ $LOWER_CLIENT ]]; then
+    VM_BASE_ROOT=/brightlink_dev/brighttrac/ndeb
+    VM_CLIENT_ROOT=/brightlink_dev/brighttrac/$LOWER_CLIENT
+else
+    VM_BASE_ROOT=/brightlink_dev/clarus/clarus
+    VM_CLIENT_ROOT=/brightlink_dev/clarus/$LOWER_CLIENT
+fi
 
 
 DOCKER0=$(/sbin/ifconfig docker0 | grep "inet addr" | awk '{ print $2}' | cut -d: -f2)
@@ -108,7 +116,7 @@ case "$COMMAND" in
                 -u docker \
                 --volumes-from vollog \
                 --name ${LOWER_CLIENT}_shell \
-                -w $VM_CLARUS_ROOT \
+                -w $VM_BASE_ROOT \
                 $IMAGE \
                 /home/docker/docker_env/bin/tg-admin -c $VM_CLIENT_ROOT/dev.cfg shell
         fi
@@ -129,7 +137,7 @@ case "$COMMAND" in
             --volumes-from vollog \
             --name ${LOWER_CLIENT}_server \
             $IMAGE \
-            /home/docker/docker_env/bin/python -u $VM_CLARUS_ROOT/start-brighttrac2.1.py $VM_CLIENT_ROOT/dev.cfg
+            /home/docker/docker_env/bin/python -u $VM_BASE_ROOT/start-brighttrac2.1.py $VM_CLIENT_ROOT/dev.cfg
         ;;
 
 
@@ -148,7 +156,7 @@ case "$COMMAND" in
             --name ${LOWER_CLIENT}_store \
             -w /brightlink_dev/clarus/clarus \
             $IMAGE \
-            /home/docker/docker_env/bin/python $VM_CLARUS_ROOT/brighttrac2/store/manage.py runserver --settings=${STORE_SETTINGS} 0.0.0.0:6086
+            /home/docker/docker_env/bin/python $VM_BASE_ROOT/brighttrac2/store/manage.py runserver --settings=${STORE_SETTINGS} 0.0.0.0:6086
 
         ;;
 
@@ -171,7 +179,7 @@ case "$COMMAND" in
                 --name ${LOWER_CLIENT}_store_shell \
                 -w /brightlink_dev/clarus/clarus \
                 $IMAGE \
-                /home/docker/docker_env/bin/python $VM_CLARUS_ROOT/brighttrac2/store/manage.py shell --settings=${STORE_SETTINGS}
+                /home/docker/docker_env/bin/python $VM_BASE_ROOT/brighttrac2/store/manage.py shell --settings=${STORE_SETTINGS}
         fi
 
         ;;
