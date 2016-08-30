@@ -29,16 +29,21 @@ fi
 
 echo "SOURCE_ROOT: $SOURCE_ROOT"
 
-CLARUS_ROOT=$SOURCE_ROOT/clarus/clarus
-NGINX_ROOT=$SOURCE_ROOT/docker/nginx
+NGINX_ROOT=$SOURCE_ROOT/infrastructure/docker/nginx
 
 if [[ "cdca cita srta" =~ $LOWER_CLIENT ]]; then
+    HOST_URL=brighttrac.dev
+    BASE_ROOT=$SOURCE_ROOT/brighttrac/adex
     VM_BASE_ROOT=/brightlink_dev/brighttrac/adex
     VM_CLIENT_ROOT=/brightlink_dev/brighttrac/$LOWER_CLIENT
 elif [[ "ndeb_acc ndeb_nonacc" =~ $LOWER_CLIENT ]]; then
+    HOST_URL=brighttrac.dev
+    BASE_ROOT=$SOURCE_ROOT/brighttrac/ndeb
     VM_BASE_ROOT=/brightlink_dev/brighttrac/ndeb
     VM_CLIENT_ROOT=/brightlink_dev/brighttrac/$LOWER_CLIENT
 else
+    HOST_URL=brighttrac.example.com
+    BASE_ROOT=$SOURCE_ROOT/clarus/clarus
     VM_BASE_ROOT=/brightlink_dev/clarus/clarus
     VM_CLIENT_ROOT=/brightlink_dev/clarus/$LOWER_CLIENT
 fi
@@ -72,9 +77,9 @@ case "$COMMAND" in
             -d \
             -p 80:80 \
             -p 443:443 \
-            -e DOMAIN_NAME=brighttrac.example.com,store.example.com \
+            -e DOMAIN_NAME=$HOST_URL,store.example.com \
             -v $SOURCE_ROOT:/brightlink_dev:ro \
-            -v $CLARUS_ROOT:/clarus:ro \
+            -v $BASE_ROOT:/clarus:ro \
             -v $MODULES_ROOT/blcore:/blcore:ro \
             -v $MODULES_ROOT/blwebtop:/webtop:ro \
             -v $NGINX_ROOT/certs:/etc/nginx/certs:ro \
@@ -85,6 +90,31 @@ case "$COMMAND" in
 
         # Change the nginx user's UID to our UID so static content will load
         docker exec nginx usermod -u $(id -u) nginx && docker restart -t 0 nginx
+
+        ;;
+
+
+    @(brighttrac_nginx) )
+
+        MODULES_ROOT=$SOURCE_ROOT/infrastructure
+
+        docker run \
+            -d \
+            -p 80:80 \
+            -p 443:443 \
+            -e DOMAIN_NAME=$HOST_URL \
+            -v $SOURCE_ROOT:/brightlink_dev:ro \
+            -v $BASE_ROOT:/brighttrac:ro \
+            -v $MODULES_ROOT/blcore:/blcore:ro \
+            -v $MODULES_ROOT/blwebtop:/webtop:ro \
+            -v $NGINX_ROOT/certs:/etc/nginx/certs:ro \
+            -v $NGINX_ROOT/vhost.d:/etc/nginx/vhost.d:ro \
+            -v /var/run/docker.sock:/tmp/docker.sock:ro \
+            --name brighttrac_nginx \
+            jwilder/nginx-proxy
+
+        # Change the nginx user's UID to our UID so static content will load
+        docker exec brighttrac_nginx usermod -u $(id -u) nginx && docker restart -t 0 brighttrac_nginx
 
         ;;
 
@@ -132,7 +162,7 @@ case "$COMMAND" in
             -p ${CLARUS_PORT}:${CLARUS_PORT} \
             -v $SOURCE_ROOT:/brightlink_dev \
             -u docker \
-            -e VIRTUAL_HOST=brighttrac.example.com \
+            -e VIRTUAL_HOST=$HOST_URL \
             -e VIRTUAL_PORT=${CLARUS_PORT} \
             --volumes-from vollog \
             --name ${LOWER_CLIENT}_server \

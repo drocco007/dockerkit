@@ -45,7 +45,8 @@ PIP="/home/docker/docker_env/bin/pip install --extra-index https://devpi.thebrig
 PYTHON="/home/docker/docker_env/bin/python"
 
 # Install core and custom
-for package in adex $CLIENT; do
+#FIXME don't hard code adex or ndeb
+for package in ndeb $CLIENT; do
     cd /brightlink_dev/brighttrac/$package
     $PIP -r requirements.txt
     $PYTHON setup.py develop

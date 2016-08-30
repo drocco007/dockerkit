@@ -36,16 +36,17 @@ Example client data to add:
 Build client database:
 
 ::
-	cd dockerkit/client_db
+	cd docker/client_db
 	./build.sh <CAPITALIZED CLIENT>
 
 Fetch database from staging:
 
 ::
-	cd dockerkit/tools
+	cd docker/tools
 	./fetch_db.sh <lowercase client>
 
-If it asks for a password it is the client database password. If you don't know it you probably don't work here. :p
+If it asks for a password, it will ask you twice, and it is the client database
+password. If you don't know it, you probably don't work here. :p
 
 Setup database:
 
@@ -67,14 +68,14 @@ Build the client image and start container:
 Clarus:
 
 ::
-	cd dockerkit/client_image
+	cd docker/client_image
 	./build.sh <CAPITALIZED CLIENT>
 	,dock bt
 
 BrightTrac:
 
 ::
-	cd dockerkit/brighttrac_image
+	cd docker/brighttrac_image
 	./build.sh <CAPITALIZED CLIENT>
 	,dock bt
 
@@ -97,7 +98,7 @@ System Images
 
 ::
 
-    cd $SOURCE_ROOT/infrastructure/dockerkit
+    cd $SOURCE_ROOT/infrastructure/docker
 
 Run the following commands from the directory listed above::
 
@@ -179,7 +180,7 @@ System Prep
 
 ::
 
-    sudo apt-get install jq libyaml-0-2 postgresql-client-9.3 libpq-dev
+    sudo apt-get install jq libyaml-0-2 postgresql-client-9.5 libpq-dev
 	mkvirtualen pgcli
 	pip install pgcli
 	ln -s `which pgcli` /home/<user>/bin/
@@ -232,7 +233,7 @@ Install busybox image next ("-it" says interactive and connect to terminal)::
 Account Configuration
 ---------------------
 
-Step 1 is to download dockerkit::
+Step 1 is to download dockerkit (and rename the directory 'docker')::
 
     cd ~/src/
 
@@ -240,7 +241,7 @@ Step 1 is to download dockerkit::
 
     cd infrastructure
 
-    git clone https://github.com/drocco007/dockerkit
+    git clone https://github.com/drocco007/dockerkit docker
 
 Step 2 is to make sure you have a bin::
 
@@ -255,7 +256,7 @@ Step 4 is to link dockerkit bin to your personal bin directory::
 
     cd ~/bin
 
-    ln -s $SOURCE_ROOT/infrastructure/dockerkit/bin/* .
+    ln -s $SOURCE_ROOT/infrastructure/docker/bin/* .
 
 Make sure PATH includes ``$HOME/bin``
 
