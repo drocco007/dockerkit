@@ -65,14 +65,21 @@ To see if database is set up do:
 	,pgcli
 
 Build the client image and start container:
-Clarus:
+Clarus Clients (except NHA):
 
 ::
 	cd docker/client_image
 	./build.sh <CAPITALIZED CLIENT>
 	,dock bt
 
-BrightTrac:
+NHA Special Snowflake:
+
+::
+    cd docker/client_image
+    env PACKAGES=nha-student-portal ./build.sh NHA
+	,dock bt
+
+BrightTrac Clients:
 
 ::
 	cd docker/brighttrac_image
