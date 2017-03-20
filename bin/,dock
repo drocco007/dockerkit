@@ -226,7 +226,7 @@ case "$COMMAND" in
             -u docker \
             --volumes-from vollog \
             --name ${LOWER_CLIENT}_job_queue \
-            -w /brightlink_dev/clarus/clarus \
+            -w $VM_BASE_ROOT \
             $IMAGE \
             /home/docker/docker_env/bin/python \
                 $VM_MODULES_ROOT/blcore/blcore/job_queue/bin/start_job_queue_processor.py $VM_CLIENT_ROOT/dev.cfg

@@ -26,7 +26,7 @@ $PIP pytest pytest-xdist pdbpp
 
 
 # Install our packages
-for package in blcore blauthentication blconfig blerrorhandling bllang blnotification blexcel blrules blfilter bllocking blscripts blcrypto blintegration blmonitor bltemplates blwebtop bllegacy template_resolver blpayments switchboard turborest ; do
+for package in blcore blauthentication blconfig blerrorhandling bllang blnotification blexcel blrules blfilter bllocking blscripts blcrypto blintegration blmonitor bltemplates blwebtop bllegacy template_resolver blpayments switchboard turborest blmobilelink; do
     cd /brightlink_dev/infrastructure/$package
     $PYTHON setup.py develop
     cd -
