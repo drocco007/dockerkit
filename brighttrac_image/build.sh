@@ -24,8 +24,12 @@ fi
 echo $BTCLIENT $CLIENT
 
 # Host environment
-SOURCE_ROOT=$HOME/source/brightlink
-PIP_DOWNLOAD_CACHE=$HOME/.cache/pip
+if [ -z "$SOURCE_ROOT" ]
+then
+    SOURCE_ROOT=$HOME/src
+fi
+
+echo "SOURCE_ROOT: $SOURCE_ROOT"
 
 # Remove existing image
 docker rmi $CLIENT 2>/dev/null
@@ -35,15 +39,15 @@ docker rmi $CLIENT 2>/dev/null
 
 docker run -i --name "$CLIENT" \
   -e CLIENT=$CLIENT -e BTCLIENT=$BTCLIENT \
-  -v "$SOURCE_ROOT:/brightlink_dev" -v "$PIP_DOWNLOAD_CACHE:/home/docker/.cache/pip" -u docker bt_base /bin/bash <<'EOF'
+  -v "$SOURCE_ROOT:/brightlink_dev" -u docker bt_base /bin/bash <<'EOF'
 
-export PIP_DOWNLOAD_CACHE=$HOME/.cache/pip
-PIP="/home/docker/docker_env/bin/pip install "
+PIP="/home/docker/docker_env/bin/pip install --extra-index https://devpi.thebrightlink.com/ops/brightlink/+simple/ "
 PYTHON="/home/docker/docker_env/bin/python"
 
 # Install core and custom
-for package in $CLIENT ; do
-    cd /brightlink_dev/$package
+#FIXME don't hard code adex or ndeb
+for package in ndeb $CLIENT; do
+    cd /brightlink_dev/brighttrac/$package
     $PIP -r requirements.txt
     $PYTHON setup.py develop
     cd -

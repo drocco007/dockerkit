@@ -11,7 +11,7 @@ GUEST_ROOT=/brightlink_dev
 
 
 docker rm $NAME
-docker build -t "$NAME" .
+docker build -t "$NAME" --no-cache .
 
 
 docker run \
