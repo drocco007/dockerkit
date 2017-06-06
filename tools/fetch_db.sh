@@ -9,21 +9,16 @@ fi
 # Make sure client is lower case
 CLIENT=${1,,}
 
-TEMP_SCHEMA=$(ssh cloud tempfile -p ${CLIENT} -s _schema.sql)
-TEMP_DATA=$(ssh cloud tempfile -p ${CLIENT} -s _data.pgdump)
-
 # Tables for which we want the schema only
 DATA_EXCLUDES=(notification job_queue_history email email_event audit_record eem_keyed_response django_session user_notification visit visit_identity)
 
+# Remove data files if already existed
+echo "It may take a while, go make a coffee..."
+rm -f ${CLIENT}_schema.sql
+rm -f ${CLIENT}_data.pgdump
+
 # Get the schema
-ssh cloud /usr/lib/postgresql/9.3/bin/pg_dump -U ${CLIENT}_user -C -s -f $TEMP_SCHEMA ${CLIENT}_data
+/usr/lib/postgresql/9.5/bin/pg_dump -h stagedata.thebrightlink.com -U ${CLIENT}_user -C -s ${CLIENT}_data > ${CLIENT}_schema.sql
 
 # Get the data, excluding the tables in DATA_EXCLUDES
-ssh cloud /usr/lib/postgresql/9.3/bin/pg_dump -U ${CLIENT}_user -F c --data-only "${DATA_EXCLUDES[@]/#/-T }" -f $TEMP_DATA ${CLIENT}_data
-
-# Fetch the databases
-scp -C "cloud:$TEMP_SCHEMA" ${CLIENT}_schema.sql
-scp -C "cloud:$TEMP_DATA" ${CLIENT}_data.pgdump
-
-# Clean up
-ssh cloud rm $TEMP_SCHEMA $TEMP_DATA
+/usr/lib/postgresql/9.5/bin/pg_dump -h stagedata.thebrightlink.com -U ${CLIENT}_user -F c --data-only "${DATA_EXCLUDES[@]/#/-T }" ${CLIENT}_data > ${CLIENT}_data.pgdump
